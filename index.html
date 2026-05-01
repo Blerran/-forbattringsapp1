@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>Förbättringsappen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .hero {
+      background: #111827;
+      color: white;
+      padding: 28px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    .box {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary:hover {
+      background: #d1d5db;
+    }
+
+    .danger {
+      background: #dc2626;
+    }
+
+    .danger:hover {
+      background: #b91c1c;
+    }
+
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 14px;
+      background: #ffffff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .high { background: #fee2e2; color: #991b1b; }
+    .medium { background: #fef3c7; color: #92400e; }
+    .low { background: #dcfce7; color: #166534; }
+
+    .stat {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat strong {
+      font-size: 24px;
+      display: block;
+    }
+
+    .small {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="hero">
+      <h1>Förbättringsappen</h1>
+      <p>Från problem till beslut på sekunder</p>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="box">
+          <textarea id="ideaInput" placeholder="Beskriv ett problem..."></textarea>
+          <button onclick="addIdea()">Analysera</button>
+        </div>
+
+        <div id="ideasList"></div>
+      </div>
+
+      <div>
+        <div class="box">
+          <div class="stat">
+            <span class="small">Totalt</span>
+            <strong id="totalIdeas">0</strong>
+          </div>
+
+          <div class="stat">
+            <span class="small">Hög prioritet</span>
+            <strong id="highIdeas">0</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ideas = JSON.parse(localStorage.getItem("ideas")) || [];
+
+    function save() {
+      localStorage.setItem("ideas", JSON.stringify(ideas));
+    }
+
+    function analyze(text) {
+      let priority = "Medel";
+
+      if (text.includes("tid") || text.includes("fel") || text.includes("stress")) {
+        priority = "Hög";
+      }
+
+      return {
+        text,
+        priority
+      };
+    }
+
+    function addIdea() {
+      const input = document.getElementById("ideaInput");
+      const text = input.value;
+
+      if (!text) return;
+
+      const idea = analyze(text);
+      ideas.unshift(idea);
+      save();
+      input.value = "";
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById("ideasList");
+
+      list.innerHTML = ideas.map(i => `
+        <div class="card">
+          <span class="badge ${i.priority === "Hög" ? "high" : "medium"}">${i.priority}</span>
+          <p>${i.text}</p>
+        </div>
+      `).join("");
+
+      document.getElementById("totalIdeas").textContent = ideas.length;
+      document.getElementById("highIdeas").textContent =
+        ideas.filter(i => i.priority === "Hög").length;
+    }
+
+    render();
+  </script>
+</body>
+</html>
