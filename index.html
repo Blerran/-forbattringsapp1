@@ -2,77 +2,70 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Förbättringsappen</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
       margin: 0;
-      padding: 20px;
-      color: #1f2937;
+      padding: 16px;
+      color: #111827;
     }
 
     .app {
-      max-width: 1100px;
+      max-width: 900px;
       margin: auto;
     }
 
     .hero {
       background: #111827;
       color: white;
-      padding: 28px;
+      padding: 22px;
       border-radius: 18px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .hero h1 {
-      margin: 0 0 10px;
-      font-size: 30px;
+      margin: 0 0 6px;
+      font-size: 26px;
     }
 
     .hero p {
       margin: 0;
       color: #d1d5db;
-      font-size: 16px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
-    }
-
-    .box {
+    .box, .card {
       background: white;
       border-radius: 16px;
-      padding: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
 
     textarea {
       width: 100%;
-      min-height: 140px;
+      min-height: 120px;
       border: 1px solid #d1d5db;
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       font-size: 16px;
-      resize: vertical;
       box-sizing: border-box;
     }
 
-    button {
-      background: #2563eb;
-      color: white;
+    button, label.upload {
+      display: inline-block;
       border: none;
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 12px 14px;
+      margin-top: 8px;
+      margin-right: 6px;
       font-size: 15px;
       cursor: pointer;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
+      background: #2563eb;
+      color: white;
     }
 
     .secondary {
@@ -80,24 +73,19 @@
       color: #111827;
     }
 
-    .secondary:hover {
-      background: #d1d5db;
-    }
-
     .danger {
       background: #dc2626;
     }
 
-    .danger:hover {
-      background: #b91c1c;
+    input[type="file"] {
+      display: none;
     }
 
-    .card {
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 14px;
-      background: #ffffff;
+    .preview {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 12px;
+      display: none;
     }
 
     .badge {
@@ -105,25 +93,29 @@
       padding: 5px 10px;
       border-radius: 999px;
       font-size: 13px;
-      margin-bottom: 10px;
       font-weight: bold;
+      margin-bottom: 8px;
     }
 
-    .high { background: #fee2e2; color: #991b1b; }
-    .medium { background: #fef3c7; color: #92400e; }
-    .low { background: #dcfce7; color: #166534; }
+    .high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-    .stat {
-      background: #f9fafb;
+    .medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .low {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .card img {
+      max-width: 100%;
       border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .stat strong {
-      font-size: 24px;
-      display: block;
+      margin: 10px 0;
     }
 
     .small {
@@ -131,10 +123,24 @@
       font-size: 14px;
     }
 
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -143,84 +149,263 @@
   <div class="app">
     <div class="hero">
       <h1>Förbättringsappen</h1>
-      <p>Från problem till beslut på sekunder</p>
+      <p>Fånga problem med text, röst eller bild och skapa ett beslutskort.</p>
     </div>
 
-    <div class="grid">
-      <div>
-        <div class="box">
-          <textarea id="ideaInput" placeholder="Beskriv ett problem..."></textarea>
-          <button onclick="addIdea()">Analysera</button>
-        </div>
+    <div class="box">
+      <h2>Ny förbättring</h2>
 
-        <div id="ideasList"></div>
+      <textarea id="ideaInput" placeholder="Beskriv problemet här..."></textarea>
+
+      <br>
+
+      <button onclick="startVoice()">🎙 Tala in</button>
+
+      <label class="upload">
+        📷 Ta bild
+        <input type="file" accept="image/*" capture="environment" onchange="handleImage(event)" />
+      </label>
+
+      <button onclick="addIdea()">Skapa beslutskort</button>
+      <button class="secondary" onclick="clearInput()">Rensa</button>
+
+      <p id="voiceStatus" class="small"></p>
+      <img id="imagePreview" class="preview" />
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="small">Totalt</span>
+        <strong id="totalIdeas">0</strong>
       </div>
-
-      <div>
-        <div class="box">
-          <div class="stat">
-            <span class="small">Totalt</span>
-            <strong id="totalIdeas">0</strong>
-          </div>
-
-          <div class="stat">
-            <span class="small">Hög prioritet</span>
-            <strong id="highIdeas">0</strong>
-          </div>
-        </div>
+      <div class="stat">
+        <span class="small">Hög prioritet</span>
+        <strong id="highIdeas">0</strong>
       </div>
     </div>
+
+    <div id="ideasList"></div>
   </div>
 
   <script>
-    let ideas = JSON.parse(localStorage.getItem("ideas")) || [];
+    let ideas = JSON.parse(localStorage.getItem("ideas_voice_image")) || [];
+    let selectedImage = "";
 
-    function save() {
-      localStorage.setItem("ideas", JSON.stringify(ideas));
+    function saveIdeas() {
+      localStorage.setItem("ideas_voice_image", JSON.stringify(ideas));
     }
 
-    function analyze(text) {
+    function startVoice() {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("Din webbläsare stödjer inte röstinmatning. Testa Chrome eller Safari.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "sv-SE";
+      recognition.interimResults = false;
+
+      document.getElementById("voiceStatus").textContent = "Lyssnar... prata nu.";
+
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        const text = event.results[0][0].transcript;
+        const input = document.getElementById("ideaInput");
+
+        input.value = input.value
+          ? input.value + " " + text
+          : text;
+
+        document.getElementById("voiceStatus").textContent = "Röst sparad.";
+      };
+
+      recognition.onerror = function() {
+        document.getElementById("voiceStatus").textContent =
+          "Kunde inte lyssna. Testa igen.";
+      };
+
+      recognition.onend = function() {
+        setTimeout(() => {
+          document.getElementById("voiceStatus").textContent = "";
+        }, 2000);
+      };
+    }
+
+    function handleImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        selectedImage = e.target.result;
+        const preview = document.getElementById("imagePreview");
+        preview.src = selectedImage;
+        preview.style.display = "block";
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function analyzeIdea(text, hasImage) {
+      const lower = text.toLowerCase();
       let priority = "Medel";
 
-      if (text.includes("tid") || text.includes("fel") || text.includes("stress")) {
+      if (
+        lower.includes("fel") ||
+        lower.includes("stress") ||
+        lower.includes("risk") ||
+        lower.includes("farligt") ||
+        lower.includes("tid") ||
+        lower.includes("väntar") ||
+        lower.includes("dubbel")
+      ) {
         priority = "Hög";
       }
 
+      if (
+        lower.includes("önskemål") ||
+        lower.includes("litet") ||
+        lower.includes("nice")
+      ) {
+        priority = "Låg";
+      }
+
       return {
-        text,
-        priority
+        priority,
+        problem: text || "Problem rapporterat med bild.",
+        rootCause: guessRootCause(lower, hasImage),
+        solution: guessSolution(lower, hasImage),
+        effect: guessEffect(lower),
+        nextStep: "Testa en enkel åtgärd i liten skala och följ upp efter 1–2 veckor."
       };
+    }
+
+    function guessRootCause(text, hasImage) {
+      if (text.includes("dubbel") || text.includes("system")) {
+        return "Troligt dubbelarbete eller otydligt systemstöd.";
+      }
+      if (text.includes("väntar") || text.includes("beslut")) {
+        return "Otydlig ansvarsfördelning eller för lång beslutsväg.";
+      }
+      if (text.includes("fel")) {
+        return "Saknad kontrollpunkt eller otydlig rutin.";
+      }
+      if (hasImage) {
+        return "Bilden visar sannolikt ett konkret problem som behöver bedömas närmare.";
+      }
+      return "Trolig orsak är otydlig rutin, ansvar eller uppföljning.";
+    }
+
+    function guessSolution(text, hasImage) {
+      if (text.includes("system")) {
+        return "Kartlägg flödet och samla information på ett ställe.";
+      }
+      if (text.includes("beslut")) {
+        return "Inför tydlig beslutsnivå och svarstid.";
+      }
+      if (text.includes("fel")) {
+        return "Skapa checklista och följ upp återkommande fel.";
+      }
+      if (hasImage) {
+        return "Gå igenom bilden med ansvarig person och besluta om snabb åtgärd.";
+      }
+      return "Standardisera arbetssättet och gör en liten testförbättring.";
+    }
+
+    function guessEffect(text) {
+      if (text.includes("tid") || text.includes("väntar") || text.includes("dubbel")) {
+        return "Kortare ledtid och mindre onödigt arbete.";
+      }
+      if (text.includes("stress") || text.includes("arbetsmiljö")) {
+        return "Bättre arbetsmiljö och lägre belastning.";
+      }
+      if (text.includes("fel")) {
+        return "Färre fel och mindre omarbete.";
+      }
+      return "Tydligare arbetssätt och bättre uppföljning.";
     }
 
     function addIdea() {
       const input = document.getElementById("ideaInput");
-      const text = input.value;
+      const text = input.value.trim();
 
-      if (!text) return;
+      if (!text && !selectedImage) {
+        alert("Skriv, tala in eller ta en bild först.");
+        return;
+      }
 
-      const idea = analyze(text);
-      ideas.unshift(idea);
-      save();
-      input.value = "";
-      render();
+      const analysis = analyzeIdea(text, !!selectedImage);
+
+      ideas.unshift({
+        id: Date.now(),
+        text,
+        image: selectedImage,
+        createdAt: new Date().toLocaleString("sv-SE"),
+        ...analysis
+      });
+
+      saveIdeas();
+      clearInput();
+      renderIdeas();
     }
 
-    function render() {
+    function clearInput() {
+      document.getElementById("ideaInput").value = "";
+      document.getElementById("voiceStatus").textContent = "";
+      selectedImage = "";
+      const preview = document.getElementById("imagePreview");
+      preview.src = "";
+      preview.style.display = "none";
+    }
+
+    function deleteIdea(id) {
+      ideas = ideas.filter(i => i.id !== id);
+      saveIdeas();
+      renderIdeas();
+    }
+
+    function badgeClass(priority) {
+      if (priority === "Hög") return "high";
+      if (priority === "Låg") return "low";
+      return "medium";
+    }
+
+    function renderIdeas() {
       const list = document.getElementById("ideasList");
 
-      list.innerHTML = ideas.map(i => `
-        <div class="card">
-          <span class="badge ${i.priority === "Hög" ? "high" : "medium"}">${i.priority}</span>
-          <p>${i.text}</p>
-        </div>
-      `).join("");
+      if (ideas.length === 0) {
+        list.innerHTML = "<p class='small'>Inga förbättringar ännu.</p>";
+      } else {
+        list.innerHTML = ideas.map(i => `
+          <div class="card">
+            <span class="badge ${badgeClass(i.priority)}">${i.priority} prioritet</span>
+
+            ${i.image ? `<img src="${i.image}" alt="Bild på förbättring" />` : ""}
+
+            <p><b>Problem:</b> ${i.problem}</p>
+            <p><b>Trolig orsak:</b> ${i.rootCause}</p>
+            <p><b>Föreslagen lösning:</b> ${i.solution}</p>
+            <p><b>Förväntad effekt:</b> ${i.effect}</p>
+            <p><b>Nästa steg:</b> ${i.nextStep}</p>
+
+            <p class="small">Skapad: ${i.createdAt}</p>
+
+            <button class="danger" onclick="deleteIdea(${i.id})">Ta bort</button>
+          </div>
+        `).join("");
+      }
 
       document.getElementById("totalIdeas").textContent = ideas.length;
       document.getElementById("highIdeas").textContent =
         ideas.filter(i => i.priority === "Hög").length;
     }
 
-    render();
+    renderIdeas();
   </script>
 </body>
 </html>
